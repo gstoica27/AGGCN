@@ -14,12 +14,14 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.autograd import Variable
+import pickle
+from collections import defaultdict
 
 from data.loader import DataLoader
 from model.trainer import GCNTrainer
 from utils import torch_utils, scorer, constant, helper
 from utils.vocab import Vocab
-from collections import defaultdict
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', type=str, default='/usr0/home/gis/data/tacred/data/json')
@@ -98,17 +100,28 @@ emb_matrix = np.load(emb_file)
 assert emb_matrix.shape[0] == vocab.size
 assert emb_matrix.shape[1] == opt['emb_dim']
 
+
+# EXCLUDED_TRIPLES = {('ORGANIZATION', 'org:member_of', 'LOCATION')}
+
+EXCLUDED_TRIPLES = {('PERSON', 'per:countries_of_residence', 'NATIONALITY'),
+                    ('ORGANIZATION', 'org:country_of_headquarters', 'COUNTRY'),
+                    ('PERSON', 'per:alternate_names', 'PERSON'),
+                    ('ORGANIZATION', 'org:parents', 'COUNTRY'),
+                    ('ORGANIZATION', 'org:subsidiaries', 'LOCATION')}
+
 # load data
 print("Loading data from {} with batch size {}...".format(opt['data_dir'], opt['batch_size']))
-train_batch = DataLoader(opt['data_dir'] + '/train.json', opt['batch_size'], opt, vocab, evaluation=False)
-dev_batch = DataLoader(opt['data_dir'] + '/dev.json', opt['batch_size'], opt, vocab, evaluation=True)
-test_batch = DataLoader(opt['data_dir'] + '/test.json', opt['batch_size'], opt, vocab, evaluation=True)
+train_batch = DataLoader(opt['data_dir'] + '/train.json', opt['batch_size'], opt, vocab, evaluation=False, exclude_triples=EXCLUDED_TRIPLES)
+dev_batch = DataLoader(opt['data_dir'] + '/dev.json', opt['batch_size'], opt, vocab, evaluation=True, exclude_triples=EXCLUDED_TRIPLES)
+test_batch = DataLoader(opt['data_dir'] + '/test.json', opt['batch_size'], opt, vocab, evaluation=True, exclude_triples=EXCLUDED_TRIPLES)
 
 model_id = opt['id'] if len(opt['id']) > 1 else '0' + opt['id']
 model_save_dir = os.path.join(opt['model_save_dir'], model_id)
 opt['model_save_dir'] = model_save_dir
 helper.ensure_dir(model_save_dir, verbose=True)
-
+test_confusion_save_file = os.path.join(model_save_dir, 'confusions', 'test_confusion_matrix.pkl')
+dev_confusion_save_file = os.path.join(model_save_dir, 'confusions', 'dev_confusion_matrix.pkl')
+os.makedirs(os.path.join(model_save_dir, 'confusions'), exist_ok=True)
 # save config
 helper.save_config(opt, model_save_dir + '/config.json', verbose=True)
 vocab.save(model_save_dir + '/vocab.pkl')
@@ -207,6 +220,21 @@ for epoch in range(1, opt['num_epoch']+1):
         print("New best model saved")
         file_logger.log("new best model saved at epoch {}: {:.2f}\t{:.2f}\t{:.2f}" \
                         .format(epoch, dev_p * 100, dev_r * 100, dev_score * 100))
+
+        # Compute Confusion Matrices over triples excluded in Training
+        test_triple_preds = np.array(test_predictions)[test_batch.triple_idxs]
+        test_triple_gold = np.array(test_batch.gold())[test_batch.triple_idxs]
+        dev_triple_preds = np.array(dev_predictions)[dev_batch.triple_idxs]
+        dev_triple_gold = np.array(dev_batch.gold())[dev_batch.triple_idxs]
+        test_confusion_matrix = scorer.compute_confusion_matrices(ground_truth=test_triple_gold,
+                                                                  predictions=test_triple_preds)
+        dev_confusion_matrix = scorer.compute_confusion_matrices(ground_truth=dev_triple_gold,
+                                                                 predictions=dev_triple_preds)
+        print("Saving Excluded Triple Confusion Matrices...")
+        with open(test_confusion_save_file, 'wb') as handle:
+            pickle.dump(test_confusion_matrix, handle)
+        with open(dev_confusion_save_file, 'wb') as handle:
+            pickle.dump(dev_confusion_matrix, handle)
 
     print("Best Dev Metrics | F1: {} | Precision: {} | Recall: {}".format(
         best_dev_metrics['f1'], best_dev_metrics['precision'], best_dev_metrics['recall']
