@@ -19,6 +19,7 @@ from data.loader import DataLoader
 from model.trainer import GCNTrainer
 from utils import torch_utils, scorer, constant, helper
 from utils.vocab import Vocab
+from collections import defaultdict
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', type=str, default='dataset/tacred')
@@ -100,6 +101,7 @@ assert emb_matrix.shape[1] == opt['emb_dim']
 print("Loading data from {} with batch size {}...".format(opt['data_dir'], opt['batch_size']))
 train_batch = DataLoader(opt['data_dir'] + '/train.json', opt['batch_size'], opt, vocab, evaluation=False)
 dev_batch = DataLoader(opt['data_dir'] + '/dev.json', opt['batch_size'], opt, vocab, evaluation=True)
+test_batch = DataLoader(opt['data_dir'] + '/test.json', opt['batch_size'], opt, vocab, evaluation=True)
 
 model_id = opt['id'] if len(opt['id']) > 1 else '0' + opt['id']
 model_save_dir = opt['save_dir'] + '/' + model_id
@@ -134,6 +136,8 @@ global_step = 0
 global_start_time = time.time()
 format_str = '{}: step {}/{} (epoch {}/{}), loss = {:.6f} ({:.3f} sec/batch), lr: {:.6f}'
 max_steps = len(train_batch) * opt['num_epoch']
+best_dev_metrics = defaultdict(lambda: -np.inf)
+test_metrics_at_best_dev = defaultdict(lambda: -np.inf)
 
 # start training
 for epoch in range(1, opt['num_epoch']+1):
@@ -148,34 +152,79 @@ for epoch in range(1, opt['num_epoch']+1):
             print(format_str.format(datetime.now(), global_step, max_steps, epoch,\
                     opt['num_epoch'], loss, duration, current_lr))
 
+    # eval on train
+    print("Evaluating on train set...")
+    predictions = []
+    train_eval_loss = 0
+    for i, batch in enumerate(train_batch):
+        # for i, _ in enumerate([]):
+        preds, _, loss = trainer.predict(batch)
+        predictions += preds
+        train_eval_loss += loss
+    predictions = [id2label[p] for p in predictions]
+    train_p, train_r, train_f1 = scorer.score(train_batch.gold(), predictions)
+
+    train_loss = train_loss / train_batch.num_examples * opt['batch_size']  # avg loss per batch
+    train_eval_loss = train_eval_loss / train_batch.num_examples * opt['batch_size']
+    print("epoch {}: train_loss = {:.6f}, dev_loss = {:.6f}, dev_f1 = {:.4f}".format(epoch,
+                                                                                     train_loss,
+                                                                                     train_eval_loss, train_f1))
+    file_logger.log("{}\t{:.6f}\t{:.6f}\t{:.4f}".format(epoch, train_loss, train_eval_loss, train_f1))
+
     # eval on dev
     print("Evaluating on dev set...")
-    predictions = []
+    dev_predictions = []
     dev_loss = 0
     for i, batch in enumerate(dev_batch):
         preds, _, loss = trainer.predict(batch)
-        predictions += preds
+        dev_predictions += preds
         dev_loss += loss
-    predictions = [id2label[p] for p in predictions]
+    dev_predictions = [id2label[p] for p in dev_predictions]
     train_loss = train_loss / train_batch.num_examples * opt['batch_size'] # avg loss per batch
     dev_loss = dev_loss / dev_batch.num_examples * opt['batch_size']
 
-    dev_p, dev_r, dev_f1 = scorer.score(dev_batch.gold(), predictions)
-    print("epoch {}: train_loss = {:.6f}, dev_loss = {:.6f}, dev_f1 = {:.4f}".format(epoch,\
-        train_loss, dev_loss, dev_f1))
+    dev_p, dev_r, dev_f1 = scorer.score(dev_batch.gold(), dev_predictions)
+    print("epoch {}: train_loss = {:.6f}, dev_loss = {:.6f}, dev_f1 = {:.4f}".format(
+        epoch, train_loss, dev_loss, dev_f1))
     dev_score = dev_f1
-    file_logger.log("{}\t{:.6f}\t{:.6f}\t{:.4f}\t{:.4f}".format(epoch, train_loss, dev_loss, dev_score, max([dev_score] + dev_score_history)))
+    file_logger.log("{}\t{:.6f}\t{:.6f}\t{:.4f}\t{:.4f}".format(
+        epoch, train_loss, dev_loss, dev_score, max([dev_score] + dev_score_history)))
+    current_dev_metrics = {'f1': dev_f1, 'precision': dev_p, 'recall': dev_r}
+    # eval on test
+    test_predictions = []
+    for i, batch in enumerate(test_batch):
+        preds, _, loss = trainer.predict(batch)
+        test_predictions += preds
+    test_predictions = [id2label[p] for p in test_predictions]
+    test_p, test_r, test_f1 = scorer.score(test_batch.gold(), test_predictions)
+    test_metrics_at_current_dev = {'f1': test_f1, 'precision': test_p, 'recall': test_r}
+
+    if best_dev_metrics['f1'] <= current_dev_metrics['f1']:
+        best_dev_metrics = current_dev_metrics
+        test_metrics_at_best_dev = test_metrics_at_current_dev
+        trainer.save(os.path.join(model_save_dir, 'best_model.pt'), epoch)
+        print("New best model saved")
+        file_logger.log("new best model saved at epoch {}: {:.2f}\t{:.2f}\t{:.2f}" \
+                        .format(epoch, dev_p * 100, dev_r * 100, dev_score * 100))
+
+    print("Best Dev Metrics | F1: {} | Precision: {} | Recall: {}".format(
+        best_dev_metrics['f1'], best_dev_metrics['precision'], best_dev_metrics['recall']
+    ))
+    print("Test Metrics at Best Dev | F1: {} | Precision: {} | Recall: {}".format(
+        test_metrics_at_best_dev['f1'], test_metrics_at_best_dev['precision'], test_metrics_at_best_dev['recall']
+    ))
 
     # save
-    model_file = model_save_dir + '/checkpoint_epoch_{}.pt'.format(epoch)
-    trainer.save(model_file, epoch)
-    if epoch == 1 or dev_score > max(dev_score_history):
-        copyfile(model_file, model_save_dir + '/best_model.pt')
-        print("new best model saved.")
-        file_logger.log("new best model saved at epoch {}: {:.2f}\t{:.2f}\t{:.2f}"\
-            .format(epoch, dev_p*100, dev_r*100, dev_score*100))
-    if epoch % opt['save_epoch'] != 0:
-        os.remove(model_file)
+    if epoch % opt['save_epoch'] == 0:
+        model_file = model_save_dir + '/checkpoint_epoch_{}.pt'.format(epoch)
+        trainer.save(model_file, epoch)
+    # if epoch == 1 or dev_score > max(dev_score_history):
+    #     copyfile(model_file, model_save_dir + '/best_model.pt')
+    #     print("new best model saved.")
+    #     file_logger.log("new best model saved at epoch {}: {:.2f}\t{:.2f}\t{:.2f}"\
+    #         .format(epoch, dev_p*100, dev_r*100, dev_score*100))
+    # if epoch % opt['save_epoch'] != 0:
+    #     os.remove(model_file)
 
     # lr schedule
     if len(dev_score_history) > opt['decay_epoch'] and dev_score <= dev_score_history[-1] and \
