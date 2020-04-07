@@ -22,8 +22,9 @@ from utils.vocab import Vocab
 from collections import defaultdict
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_dir', type=str, default='dataset/tacred')
-parser.add_argument('--vocab_dir', type=str, default='dataset/vocab')
+parser.add_argument('--data_dir', type=str, default='/usr0/home/gis/data/tacred/data/json')
+parser.add_argument('--vocab_dir', type=str, default='/usr0/home/gis/data/tacred/data/vocab')
+parser.add_argument('--model_save_dir', type=str, default='/usr0/home/gis/research/tacred-exploration/saved_models')
 parser.add_argument('--emb_dim', type=int, default=300, help='Word embedding dimension.')
 parser.add_argument('--ner_dim', type=int, default=30, help='NER embedding dimension.')
 parser.add_argument('--pos_dim', type=int, default=30, help='POS embedding dimension.')
@@ -104,7 +105,7 @@ dev_batch = DataLoader(opt['data_dir'] + '/dev.json', opt['batch_size'], opt, vo
 test_batch = DataLoader(opt['data_dir'] + '/test.json', opt['batch_size'], opt, vocab, evaluation=True)
 
 model_id = opt['id'] if len(opt['id']) > 1 else '0' + opt['id']
-model_save_dir = opt['save_dir'] + '/' + model_id
+model_save_dir = os.path.join(opt['model_save_dir'], model_id)
 opt['model_save_dir'] = model_save_dir
 helper.ensure_dir(model_save_dir, verbose=True)
 

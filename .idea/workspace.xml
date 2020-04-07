@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="af7e3394-2930-4ef5-832a-498225e6a2eb" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/AGGCN_TACRED.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/AGGCN_TACRED.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,18 +106,38 @@
       <workItem from="1558327327950" duration="605000" />
       <workItem from="1558596289337" duration="4457000" />
       <workItem from="1558682355414" duration="2716000" />
-      <workItem from="1586298911788" duration="1032000" />
+      <workItem from="1586298911788" duration="1254000" />
     </task>
+    <task id="LOCAL-00001" summary="Added test &amp; train eval + best metric tracking">
+      <created>1586300055348</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1586300055348</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Added test &amp; train eval + best metric tracking" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added test &amp; train eval + best metric tracking" />
+  </component>
   <component name="WindowStateProjectService">
+    <state x="554" y="154" key="CommitChangelistDialog2" timestamp="1586300053886">
+      <screen x="0" y="23" width="1920" height="1057" />
+    </state>
+    <state x="554" y="154" key="CommitChangelistDialog2/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1586300053886" />
     <state x="469" y="190" key="SettingsEditor" timestamp="1586298945775">
       <screen x="0" y="23" width="1920" height="1057" />
     </state>
     <state x="469" y="190" key="SettingsEditor/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1586298945775" />
+    <state x="560" y="291" key="Vcs.Push.Dialog.v2" timestamp="1586300081497">
+      <screen x="0" y="23" width="1920" height="1057" />
+    </state>
+    <state x="560" y="291" key="Vcs.Push.Dialog.v2/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1586300081497" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/AGGCN_TACRED$train.coverage" NAME="train Coverage Results" MODIFIED="1558684644439" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
