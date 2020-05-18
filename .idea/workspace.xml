@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="af7e3394-2930-4ef5-832a-498225e6a2eb" name="Default Changelist" comment="" />
+    <list default="true" id="af7e3394-2930-4ef5-832a-498225e6a2eb" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -105,7 +107,7 @@
       <workItem from="1586298911788" duration="3306000" />
       <workItem from="1586329384070" duration="347000" />
       <workItem from="1586371176013" duration="684000" />
-      <workItem from="1589828582456" duration="3780000" />
+      <workItem from="1589828582456" duration="4054000" />
     </task>
     <task id="LOCAL-00001" summary="Added test &amp; train eval + best metric tracking">
       <created>1586300055348</created>
