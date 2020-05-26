@@ -20,6 +20,7 @@ from model.trainer import GCNTrainer
 from utils import torch_utils, scorer, constant, helper
 from utils.vocab import Vocab
 from collections import defaultdict
+import yaml
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--data_dir', type=str, default='/usr0/home/gis/data/tacred/data/json')
@@ -75,17 +76,25 @@ parser.add_argument('--model_file', type=str, help='Filename of the pretrained m
 
 args = parser.parse_args()
 
-torch.manual_seed(args.seed)
-np.random.seed(args.seed)
+cwd = os.getcwd()
+on_server = 'Desktop' not in cwd
+config_path = os.path.join(cwd, 'configs', f'{"nell" if on_server else "local"}_config.yaml')
+# config_path = os.path.join(cwd, 'configs', 'nell_config.yaml')
+with open(config_path, 'r') as file:
+    cfg_dict = yaml.load(file)
+
+cfg_dict['topn'] = float(cfg_dict['topn'])
+
+opt = cfg_dict
+torch.manual_seed(opt['seed'])
+np.random.seed(opt['seed'])
 random.seed(1234)
-if args.cpu:
-    args.cuda = False
-elif args.cuda:
-    torch.cuda.manual_seed(args.seed)
+if opt['cpu']:
+    opt['cuda'] = False
+elif opt['cuda']:
+    torch.cuda.manual_seed(opt['seed'])
 init_time = time.time()
 
-# make opt
-opt = vars(args)
 label2id = constant.LABEL_TO_ID
 opt['num_class'] = len(label2id)
 
@@ -105,7 +114,7 @@ dev_batch = DataLoader(opt['data_dir'] + '/dev.json', opt['batch_size'], opt, vo
 test_batch = DataLoader(opt['data_dir'] + '/test.json', opt['batch_size'], opt, vocab, evaluation=True)
 
 model_id = opt['id'] if len(opt['id']) > 1 else '0' + opt['id']
-model_save_dir = os.path.join(opt['model_save_dir'], model_id)
+model_save_dir = os.path.join(opt['save_dir'], model_id)
 opt['model_save_dir'] = model_save_dir
 helper.ensure_dir(model_save_dir, verbose=True)
 

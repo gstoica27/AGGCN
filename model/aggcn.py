@@ -37,9 +37,12 @@ class GCNRelationModel(nn.Module):
         self.emb_matrix = emb_matrix
 
         # create embedding layers
-        self.emb = nn.Embedding(opt['vocab_size'], opt['emb_dim'], padding_idx=constant.PAD_ID)
-        self.pos_emb = nn.Embedding(len(constant.POS_TO_ID), opt['pos_dim']) if opt['pos_dim'] > 0 else None
-        self.ner_emb = nn.Embedding(len(constant.NER_TO_ID), opt['ner_dim']) if opt['ner_dim'] > 0 else None
+        self.emb = nn.Embedding(opt['vocab_size'], opt['emb_dim'],
+                                padding_idx=constant.PAD_ID)
+        self.pos_emb = nn.Embedding(len(constant.POS_TO_ID),
+                                    opt['pos_dim']) if opt['pos_dim'] > 0 else None
+        self.ner_emb = nn.Embedding(len(constant.NER_TO_ID),
+                                    opt['ner_dim']) if opt['ner_dim'] > 0 else None
         embeddings = (self.emb, self.pos_emb, self.ner_emb)
         self.init_embeddings()
 
@@ -70,13 +73,16 @@ class GCNRelationModel(nn.Module):
             print("Finetune all embeddings.")
 
     def forward(self, inputs):
-        words, masks, pos, ner, deprel, head, subj_pos, obj_pos, subj_type, obj_type = inputs # unpack
+        base_inputs = inputs['base']
+        words, masks, pos, ner, deprel, head, subj_pos, obj_pos, subj_type, obj_type = base_inputs
         l = (masks.data.cpu().numpy() == 0).astype(np.int64).sum(1)
         maxlen = max(l)
 
         def inputs_to_tree_reps(head, l):
             trees = [head_to_tree(head[i], l[i]) for i in range(len(l))]
-            adj = [tree_to_adj(maxlen, tree, directed=False).reshape(1, maxlen, maxlen) for tree in trees]
+            adj = [tree_to_adj(maxlen, tree, directed=False).reshape(
+                1, maxlen, maxlen
+            ) for tree in trees]
             adj = np.concatenate(adj, axis=0)
             adj = torch.from_numpy(adj)
             return Variable(adj.cuda()) if self.opt['cuda'] else Variable(adj)
@@ -85,7 +91,8 @@ class GCNRelationModel(nn.Module):
         h, pool_mask = self.gcn(adj, inputs)
 
         # pooling
-        subj_mask, obj_mask = subj_pos.eq(0).eq(0).unsqueeze(2), obj_pos.eq(0).eq(0).unsqueeze(2)  # invert mask
+        subj_mask, obj_mask = subj_pos.eq(0).eq(0).unsqueeze(2), \
+                              obj_pos.eq(0).eq(0).unsqueeze(2)  # invert mask
         pool_type = self.opt['pooling']
         h_out = pool(h, pool_mask, type=pool_type)
         subj_out = pool(h, subj_mask, type="max")
@@ -108,8 +115,8 @@ class AGGCN(nn.Module):
         # rnn layer
         if self.opt.get('rnn', False):
             self.input_W_R = nn.Linear(self.in_dim, opt['rnn_hidden'])
-            self.rnn = nn.LSTM(opt['rnn_hidden'], opt['rnn_hidden'], opt['rnn_layers'], batch_first=True, \
-                               dropout=opt['rnn_dropout'], bidirectional=True)
+            self.rnn = nn.LSTM(opt['rnn_hidden'], opt['rnn_hidden'], opt['rnn_layers'],
+                               batch_first=True, dropout=opt['rnn_dropout'], bidirectional=True)
             self.in_dim = opt['rnn_hidden'] * 2
             self.rnn_drop = nn.Dropout(opt['rnn_dropout'])  # use on last layer output
         self.input_W_G = nn.Linear(self.in_dim, self.mem_dim)
@@ -129,8 +136,12 @@ class AGGCN(nn.Module):
                 self.layers.append(GraphConvLayer(opt, self.mem_dim, self.sublayer_first))
                 self.layers.append(GraphConvLayer(opt, self.mem_dim, self.sublayer_second))
             else:
-                self.layers.append(MultiGraphConvLayer(opt, self.mem_dim, self.sublayer_first, self.heads))
-                self.layers.append(MultiGraphConvLayer(opt, self.mem_dim, self.sublayer_second, self.heads))
+                self.layers.append(MultiGraphConvLayer(opt, self.mem_dim,
+                                                       self.sublayer_first,
+                                                       self.heads))
+                self.layers.append(MultiGraphConvLayer(opt, self.mem_dim,
+                                                       self.sublayer_second,
+                                                       self.heads))
 
         self.aggregate_W = nn.Linear(len(self.layers) * self.mem_dim, self.mem_dim)
 
@@ -145,7 +156,8 @@ class AGGCN(nn.Module):
         return rnn_outputs
 
     def forward(self, adj, inputs):
-        words, masks, pos, ner, deprel, head, subj_pos, obj_pos, subj_type, obj_type = inputs # unpack
+        base_inputs = inputs['base']
+        words, masks, pos, ner, deprel, head, subj_pos, obj_pos, subj_type, obj_type = base_inputs
         src_mask = (words != constant.PAD_ID).unsqueeze(-2)
         word_embs = self.emb(words)
         embs = [word_embs]
@@ -201,9 +213,9 @@ class GraphConvLayer(nn.Module):
         self.weight_list = nn.ModuleList()
         for i in range(self.layers):
             self.weight_list.append(nn.Linear((self.mem_dim + self.head_dim * i), self.head_dim))
-
-        self.weight_list = self.weight_list.cuda()
-        self.linear_output = self.linear_output.cuda()
+        if torch.cuda.is_available():
+            self.weight_list = self.weight_list.cuda()
+            self.linear_output = self.linear_output.cuda()
 
     def forward(self, adj, gcn_inputs):
         # gcn layer
@@ -250,9 +262,9 @@ class MultiGraphConvLayer(nn.Module):
         for i in range(self.heads):
             for j in range(self.layers):
                 self.weight_list.append(nn.Linear(self.mem_dim + self.head_dim * j, self.head_dim))
-
-        self.weight_list = self.weight_list.cuda()
-        self.Linear = self.Linear.cuda()
+        if torch.cuda.is_available():
+            self.weight_list = self.weight_list.cuda()
+            self.Linear = self.Linear.cuda()
 
     def forward(self, adj_list, gcn_inputs):
 
@@ -297,11 +309,15 @@ def pool(h, mask, type='max'):
         return h.sum(1)
 
 
-def rnn_zero_state(batch_size, hidden_dim, num_layers, bidirectional=True):
+def rnn_zero_state(batch_size, hidden_dim, num_layers, bidirectional=True,
+                   cuda=torch.cuda.is_available()):
     total_layers = num_layers * 2 if bidirectional else num_layers
     state_shape = (total_layers, batch_size, hidden_dim)
     h0 = c0 = Variable(torch.zeros(*state_shape), requires_grad=False)
-    return h0.cuda(), c0.cuda()
+    if cuda:
+        return h0.cuda(), c0.cuda()
+    else:
+        return h0, c0
 
 
 def attention(query, key, mask=None, dropout=None):
