@@ -41,8 +41,8 @@ cpu: False # Ignore CUDA.
 load: False
 model_file:
 link_prediction:
-  model: 'ConvE'
-  label_smoothing: .1
-  lambda: 1.
-  freeze_embeddings: False
-  with_relu: True
+#  model: 'ConvE'
+#  label_smoothing: .1
+#  lambda: 1.
+#  freeze_embeddings: False
+#  with_relu: True

@@ -12,7 +12,20 @@ import numpy as np
 
 from model.tree import head_to_tree, tree_to_adj
 from utils import constant, torch_utils
+from model.link_prediction_models import *
 
+
+def initialize_link_prediction_model(params):
+    name = params['name'].lower()
+    if name == 'distmult':
+        model = DistMult(params)
+    elif name == 'conve':
+        model = ConvE(params)
+    elif name == 'complex':
+        model = Complex(params)
+    else:
+        raise ValueError('Only, {distmult, conve, and complex}  are supported')
+    return model
 
 class GCNClassifier(nn.Module):
     """ A wrapper classifier for GCNRelationModel. """
@@ -25,9 +38,9 @@ class GCNClassifier(nn.Module):
         self.opt = opt
 
     def forward(self, inputs):
-        logits, pooling_output = self.gcn_model(inputs)
+        logits, pooling_output, supplemental_losses = self.gcn_model(inputs)
         # logits = self.classifier(logits)
-        return logits, pooling_output
+        return logits, pooling_output, supplemental_losses
 
 
 class GCNRelationModel(nn.Module):
@@ -48,12 +61,28 @@ class GCNRelationModel(nn.Module):
 
         # gcn layer
         self.gcn = AGGCN(opt, embeddings)
+        # LP Model
+        if opt['link_prediction'] is not None:
+            link_prediction_cfg = opt['link_prediction']['model']
+            self.rel_emb = nn.Embedding(opt['num_relations'], link_prediction_cfg['rel_emb_dim'])
+            self.register_parameter('rel_bias', torch.nn.Parameter(torch.zeros((opt['num_relations']))))
+            self.object_indices = torch.from_numpy(np.array(self.opt['object_indices']))
+            if opt['cuda']:
+                self.object_indices = self.object_indices.cuda()
+            self.lp_model = initialize_link_prediction_model(link_prediction_cfg)
 
         # mlp output layer
         in_dim = opt['hidden_dim'] * 3
         layers = [nn.Linear(in_dim, opt['hidden_dim']), nn.ReLU()]
         for _ in range(self.opt['mlp_layers'] - 1):
-            layers += [nn.Linear(opt['hidden_dim'], opt['hidden_dim']), nn.ReLU()]
+            if opt['link_prediction'] is None or _ < self.opt['mlp_layers'] - 2:
+                output_dim = opt['hidden_dim']
+                layers += [nn.Linear(opt['hidden_dim'], output_dim), nn.ReLU()]
+            else:
+                output_dim = opt['link_prediction']['model']['rel_emb_dim']
+                layers += [nn.Linear(opt['hidden_dim'], output_dim)]
+                if opt['link_prediction']['with_relu']:
+                    layers += [nn.ReLU()]
         self.out_mlp = nn.Sequential(*layers)
         # Classifier for baseline model
         in_dim = opt['hidden_dim']
@@ -102,8 +131,28 @@ class GCNRelationModel(nn.Module):
         obj_out = pool(h, obj_mask, type="max")
         outputs = torch.cat([h_out, subj_out, obj_out], dim=1)
         outputs = self.out_mlp(outputs)
-        logits = self.classifier(outputs)
-        return logits, h_out
+
+        if self.opt['link_prediction'] is not None:
+            subjects, relations, known_objects = inputs['kg']
+            object_embs = self.emb(self.object_indices)
+            subject_embs = self.emb(subjects)
+            relation_embs = self.rel_emb(relations)
+            # Predict objects with LP model
+            observed_preds = self.lp_model(subject_embs, relation_embs, object_embs)
+            baseline_preds = self.lp_model(subject_embs, outputs, object_embs)
+            # Compute loss terms
+            observed_loss = self.lp_model.loss(observed_preds, known_objects)
+            baseline_loss = self.lp_model.loss(baseline_preds, known_objects)
+            supplemental_losses = {'observed': observed_loss, 'baseline': baseline_loss}
+            # Relation extraction loss
+            logits = torch.mm(outputs, self.rel_emb.weight.transpose(1, 0))
+            logits += self.rel_bias.expand_as(logits)
+        else:
+            logits = self.classifier(outputs)
+            # logits = outputs
+            supplemental_losses = {}
+
+        return logits, h_out, supplemental_losses
 
 
 class AGGCN(nn.Module):
