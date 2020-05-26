@@ -104,6 +104,13 @@ class GCNTrainer(Trainer):
         # l2 penalty on output representations
         if self.opt.get('pooling_l2', 0) > 0:
             loss += self.opt['pooling_l2'] * (pooling_output ** 2).sum(1).mean()
+        if self.opt['link_prediction'] is not None:
+            observed_loss = supplemental_losses['observed']
+            predicted_loss = supplemental_losses['baseline']
+            loss += (observed_loss + predicted_loss) * self.opt['link_prediction']['lambda']
+            observed_loss_value = observed_loss.data.item()
+            predicted_loss_value = predicted_loss.data.item()
+            # losses.update({'kg_observed': observed_loss_value, 'kg_predicted': predicted_loss_value})
         loss_val = loss.item()
         # backward
         loss.backward()
