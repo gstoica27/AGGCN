@@ -2,20 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="af7e3394-2930-4ef5-832a-498225e6a2eb" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/AGGCN_TACRED.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/AGGCN_TACRED.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>test_f1 = 0.67</find>
-      <find>best</find>
-      <find>test_f1 = 0.68</find>
-      <find>test_f1 = 0.6</find>
-    </findStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -24,12 +20,13 @@
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -115,7 +112,14 @@
       <option name="project" value="LOCAL" />
       <updated>1586300055348</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Incremental LP additions | If statement wrapped cudas">
+      <created>1590523369513</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1590523369513</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -123,24 +127,69 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Added test &amp; train eval + best metric tracking" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added test &amp; train eval + best metric tracking" />
+    <MESSAGE value="Incremental LP additions | If statement wrapped cudas" />
+    <option name="LAST_COMMIT_MESSAGE" value="Incremental LP additions | If statement wrapped cudas" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="554" y="154" key="CommitChangelistDialog2" timestamp="1586300053886">
+    <state x="554" y="154" key="CommitChangelistDialog2" timestamp="1590523369430">
       <screen x="0" y="23" width="1920" height="1057" />
     </state>
-    <state x="554" y="154" key="CommitChangelistDialog2/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1586300053886" />
+    <state x="554" y="154" key="CommitChangelistDialog2/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590523369430" />
+    <state width="750" height="582" key="GridCell.Tab.0.bottom" timestamp="1590523981119">
+      <screen x="0" y="23" width="1920" height="1057" />
+    </state>
+    <state width="750" height="582" key="GridCell.Tab.0.bottom/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590523981119" />
+    <state width="750" height="582" key="GridCell.Tab.0.center" timestamp="1590523981119">
+      <screen x="0" y="23" width="1920" height="1057" />
+    </state>
+    <state width="750" height="582" key="GridCell.Tab.0.center/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590523981119" />
+    <state width="750" height="582" key="GridCell.Tab.0.left" timestamp="1590523981118">
+      <screen x="0" y="23" width="1920" height="1057" />
+    </state>
+    <state width="750" height="582" key="GridCell.Tab.0.left/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590523981118" />
+    <state width="750" height="582" key="GridCell.Tab.0.right" timestamp="1590523981119">
+      <screen x="0" y="23" width="1920" height="1057" />
+    </state>
+    <state width="750" height="582" key="GridCell.Tab.0.right/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590523981119" />
+    <state width="750" height="582" key="GridCell.Tab.1.bottom" timestamp="1590523981120">
+      <screen x="0" y="23" width="1920" height="1057" />
+    </state>
+    <state width="750" height="582" key="GridCell.Tab.1.bottom/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590523981120" />
+    <state width="750" height="582" key="GridCell.Tab.1.center" timestamp="1590523981119">
+      <screen x="0" y="23" width="1920" height="1057" />
+    </state>
+    <state width="750" height="582" key="GridCell.Tab.1.center/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590523981119" />
+    <state width="750" height="582" key="GridCell.Tab.1.left" timestamp="1590523981119">
+      <screen x="0" y="23" width="1920" height="1057" />
+    </state>
+    <state width="750" height="582" key="GridCell.Tab.1.left/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590523981119" />
+    <state width="750" height="582" key="GridCell.Tab.1.right" timestamp="1590523981120">
+      <screen x="0" y="23" width="1920" height="1057" />
+    </state>
+    <state width="750" height="582" key="GridCell.Tab.1.right/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590523981120" />
     <state x="469" y="190" key="SettingsEditor" timestamp="1586298945775">
       <screen x="0" y="23" width="1920" height="1057" />
     </state>
     <state x="469" y="190" key="SettingsEditor/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1586298945775" />
-    <state x="560" y="291" key="Vcs.Push.Dialog.v2" timestamp="1586300081497">
+    <state x="560" y="291" key="Vcs.Push.Dialog.v2" timestamp="1590523370226">
       <screen x="0" y="23" width="1920" height="1057" />
     </state>
-    <state x="560" y="291" key="Vcs.Push.Dialog.v2/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1586300081497" />
+    <state x="560" y="291" key="Vcs.Push.Dialog.v2/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590523370226" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/../../icloud_desktop/Research/gcn-over-pruned-trees/data/loader.py</url>
+          <line>4</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/AGGCN_TACRED$train.coverage" NAME="train Coverage Results" MODIFIED="1558684644439" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/AGGCN_TACRED$eval.coverage" NAME="eval Coverage Results" MODIFIED="1558683901583" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/AGGCN$train.coverage" NAME="train Coverage Results" MODIFIED="1590523292771" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
