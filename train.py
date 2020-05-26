@@ -85,8 +85,8 @@ with open(config_path, 'r') as file:
 
 cfg_dict['topn'] = float(cfg_dict['topn'])
 
-# opt = cfg_dict
-opt = vars(args)
+opt = cfg_dict
+# opt = vars(args)
 torch.manual_seed(opt['seed'])
 np.random.seed(opt['seed'])
 random.seed(1234)
