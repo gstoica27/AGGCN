@@ -72,15 +72,21 @@ class GCNRelationModel(nn.Module):
             self.lp_model = initialize_link_prediction_model(link_prediction_cfg)
 
         # mlp output layer
-        in_dim = opt['hidden_dim'] * 3
-        layers = [nn.Linear(in_dim, opt['hidden_dim']), nn.ReLU()]
-        for _ in range(self.opt['mlp_layers'] - 1):
-            if opt['link_prediction'] is None or _ < self.opt['mlp_layers'] - 2:
+        # in_dim = opt['hidden_dim'] * 3
+        # layers = [nn.Linear(in_dim, opt['hidden_dim']), nn.ReLU()]
+        layers = []
+        for _ in range(self.opt['mlp_layers']):
+            if _ == 0:
+                in_dim = opt['hidden_dim'] * 3
+            else:
+                in_dim = opt['hidden_dim']
+
+            if opt['link_prediction'] is None or _ < self.opt['mlp_layers'] - 1:
                 output_dim = opt['hidden_dim']
-                layers += [nn.Linear(opt['hidden_dim'], output_dim), nn.ReLU()]
+                layers += [nn.Linear(in_dim, output_dim), nn.ReLU()]
             else:
                 output_dim = opt['link_prediction']['model']['rel_emb_dim']
-                layers += [nn.Linear(opt['hidden_dim'], output_dim)]
+                layers += [nn.Linear(in_dim, output_dim)]
                 if opt['link_prediction']['with_relu']:
                     layers += [nn.ReLU()]
         self.out_mlp = nn.Sequential(*layers)
