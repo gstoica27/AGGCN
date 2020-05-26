@@ -37,7 +37,7 @@ id: 'AGGCN-TEST'  # Model ID under which to save models.
 info: ''  # Optional info for the experiment.
 seed: 37  # random seed
 cuda: True
-cpu: True # Ignore CUDA.
+cpu: False # Ignore CUDA.
 load: False
 model_file:
 link_prediction:
