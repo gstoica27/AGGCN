@@ -13,7 +13,7 @@ word_dropout: .04 # The rate at which randomly set a word to UNK.
 topn: 1e10  # Only finetune top N embeddings.
 lower: False  # Lowercase all words.
 heads: 3
-sublayer_first:  2
+sublayer_first: 2
 sublayer_second: 4
 pooling: 'max' # ['max', 'avg', 'sum']
 pooling_l2: 0.002
