@@ -20,13 +20,13 @@ class GCNClassifier(nn.Module):
     def __init__(self, opt, emb_matrix=None):
         super().__init__()
         self.gcn_model = GCNRelationModel(opt, emb_matrix=emb_matrix)
-        in_dim = opt['hidden_dim']
-        self.classifier = nn.Linear(in_dim, opt['num_class'])
+        # in_dim = opt['hidden_dim']
+        # self.classifier = nn.Linear(in_dim, opt['num_class'])
         self.opt = opt
 
     def forward(self, inputs):
-        outputs, pooling_output = self.gcn_model(inputs)
-        logits = self.classifier(outputs)
+        logits, pooling_output = self.gcn_model(inputs)
+        # logits = self.classifier(logits)
         return logits, pooling_output
 
 
@@ -55,6 +55,9 @@ class GCNRelationModel(nn.Module):
         for _ in range(self.opt['mlp_layers'] - 1):
             layers += [nn.Linear(opt['hidden_dim'], opt['hidden_dim']), nn.ReLU()]
         self.out_mlp = nn.Sequential(*layers)
+        # Classifier for baseline model
+        in_dim = opt['hidden_dim']
+        self.classifier = nn.Linear(in_dim, opt['num_class'])
 
     def init_embeddings(self):
         if self.emb_matrix is None:
@@ -99,8 +102,8 @@ class GCNRelationModel(nn.Module):
         obj_out = pool(h, obj_mask, type="max")
         outputs = torch.cat([h_out, subj_out, obj_out], dim=1)
         outputs = self.out_mlp(outputs)
-
-        return outputs, h_out
+        logits = self.classifier(outputs)
+        return logits, h_out
 
 
 class AGGCN(nn.Module):

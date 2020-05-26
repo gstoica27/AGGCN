@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="af7e3394-2930-4ef5-832a-498225e6a2eb" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/model/aggcn.py" beforeDir="false" afterPath="$PROJECT_DIR$/model/aggcn.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -143,7 +143,21 @@
       <option name="project" value="LOCAL" />
       <updated>1590524615431</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="cpu -&gt; False">
+      <created>1590524703807</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1590524703807</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Log step 1 -&gt; 20">
+      <created>1590524777019</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1590524777019</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -155,13 +169,15 @@
     <MESSAGE value="replacing cfg with parse args" />
     <MESSAGE value="Corrected nell config" />
     <MESSAGE value="Re-instated yaml configs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Re-instated yaml configs" />
+    <MESSAGE value="cpu -&gt; False" />
+    <MESSAGE value="Log step 1 -&gt; 20" />
+    <option name="LAST_COMMIT_MESSAGE" value="Log step 1 -&gt; 20" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="554" y="154" key="CommitChangelistDialog2" timestamp="1590524615349">
+    <state x="554" y="154" key="CommitChangelistDialog2" timestamp="1590524776951">
       <screen x="0" y="23" width="1920" height="1057" />
     </state>
-    <state x="554" y="154" key="CommitChangelistDialog2/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590524615349" />
+    <state x="554" y="154" key="CommitChangelistDialog2/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590524776951" />
     <state width="750" height="582" key="GridCell.Tab.0.bottom" timestamp="1590523981119">
       <screen x="0" y="23" width="1920" height="1057" />
     </state>
@@ -198,10 +214,10 @@
       <screen x="0" y="23" width="1920" height="1057" />
     </state>
     <state x="469" y="190" key="SettingsEditor/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1586298945775" />
-    <state x="560" y="291" key="Vcs.Push.Dialog.v2" timestamp="1590524616026">
+    <state x="560" y="291" key="Vcs.Push.Dialog.v2" timestamp="1590524777919">
       <screen x="0" y="23" width="1920" height="1057" />
     </state>
-    <state x="560" y="291" key="Vcs.Push.Dialog.v2/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590524616026" />
+    <state x="560" y="291" key="Vcs.Push.Dialog.v2/0.23.1920.1057/1920.-97.1920.1177@0.23.1920.1057" timestamp="1590524777919" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
