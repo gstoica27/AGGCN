@@ -186,7 +186,7 @@ for epoch in range(1, opt['num_epoch']+1):
         trainer.save(os.path.join(model_save_dir, 'best_model.pt'), epoch)
         print("New best model saved")
         file_logger.log("new best model saved at epoch {}: {:.2f}\t{:.2f}\t{:.2f}" \
-                        .format(epoch, dev_p * 100, dev_r * 100, dev_score * 100))
+                        .format(epoch, test_p * 100, test_r * 100, test_f1 * 100))
 
     print("Best Dev Metrics | F1: {} | Precision: {} | Recall: {}".format(
         best_dev_metrics['f1'], best_dev_metrics['precision'], best_dev_metrics['recall']

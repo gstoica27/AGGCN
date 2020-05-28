@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/AGGCN_TACRED.iml" filepath="$PROJECT_DIR$/.idea/AGGCN_TACRED.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../../icloud_desktop/Research/gcn-over-pruned-trees/.idea/gcn-over-pruned-trees.iml" filepath="$PROJECT_DIR$/../../icloud_desktop/Research/gcn-over-pruned-trees/.idea/gcn-over-pruned-trees.iml" />
     </modules>
   </component>
 </project>
