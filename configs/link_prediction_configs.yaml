@@ -4,7 +4,7 @@ ConvE:
   feat_drop: 0.2
   ent_emb_dim: 300
   ent_emb_shape1: 30
-  rel_emb_dim: 40
+  rel_emb_dim: 100
   use_bias: False
   kernel_size: (3, 3)
   filter_channels: 32
