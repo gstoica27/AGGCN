@@ -46,3 +46,4 @@ link_prediction:
   lambda: .1
   freeze_embeddings: False
   with_relu: True
+  without_no_relation: True
