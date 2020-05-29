@@ -44,6 +44,6 @@ link_prediction:
   model: 'ConvE'
   label_smoothing: .1
   lambda: .1
-  freeze_embeddings: False
+  freeze_network: False
   with_relu: True
   without_no_relation: True
